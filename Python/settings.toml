@@ -1,0 +1,7 @@
+# settings.toml
+CIRCUITPY_WIFI_SSID = "<network_name>"
+CIRCUITPY_WIFI_PASSWORD = "<password>"
+mqtt_broker = "<broker_address>"
+mqtt_port = 8883
+mqtt_username = ""
+mqtt_password = ""
