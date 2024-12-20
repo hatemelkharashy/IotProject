@@ -5,6 +5,7 @@
 #include <QMediaDevices>
 #include <QCamera>
 #include "hubmanager.h"
+#include <QQmlContext>
 
 int main(int argc, char *argv[])
 {
@@ -21,8 +22,12 @@ int main(int argc, char *argv[])
         if (!obj && url == objUrl)
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
-    engine.load(url);
 
     HubManager manager(&engine);
+    QQmlContext *context = engine.rootContext();
+    context->setContextProperty("HubManager", &manager);
+    engine.load(url);
+    manager.findCameraObjects(&engine);
+
     return app.exec();
 }

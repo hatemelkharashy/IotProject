@@ -12,8 +12,13 @@
 class HubManager : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(bool connected READ connected WRITE setConnected NOTIFY connectedChanged)
+    Q_PROPERTY(QString gesture READ gesture WRITE setGesture NOTIFY gestureChanged FINAL)
 public:
     HubManager(QQmlApplicationEngine *engine = nullptr);
+
+    QString gesture() const;
+    void setGesture(const QString &newGesture);
 
 public slots:
     void onMessageReceived(const QByteArray &message, const QMqttTopicName &topic);
@@ -21,11 +26,20 @@ public slots:
     void onConnected();
     void onImageCaptured(int id, const QImage &preview);
 
-private:
+    void setConnected(bool val);
+    bool connected() const;
     void findCameraObjects(QQmlApplicationEngine *engine);
+
+signals:
+    void connectedChanged();
+
+    void gestureChanged();
+
 private:
     QMqttClient *m_client = nullptr;
     QImageCapture *m_imageCapture = nullptr;
+    bool m_connected = false;
+    QString m_gesture = QStringLiteral("No Detection");
 };
 
 #endif // HUBMANAGER_H
