@@ -14,6 +14,7 @@ class MqttClient:
         wifi.radio.connect(os.getenv("CIRCUITPY_WIFI_SSID"), os.getenv("CIRCUITPY_WIFI_PASSWORD"))
 
     def __createClient(self):
+        measuredTime = time.monotonic()
         mqtt_client = MQTT.MQTT(
             broker=os.getenv("mqtt_broker"),
             port=os.getenv("mqtt_port"),
@@ -21,14 +22,13 @@ class MqttClient:
             password=os.getenv("mqtt_password"),
             socket_pool=socketpool.SocketPool(wifi.radio),
             ssl_context=ssl.create_default_context(),
+            use_binary_mode=True,
         )
         mqtt_client.on_connect = self.connected
         mqtt_client.on_disconnect = self.disconnected
         mqtt_client.on_message = self.message
-        print("Connecting to MQTT broker...")
-        print(f"Connecting to {os.getenv('mqtt_broker')}")
-        print(f"Connecting to {os.getenv('mqtt_port')}")
         mqtt_client.connect()
+        print("Time taken to connect : ", str(time.monotonic() - measuredTime))
         self.client = mqtt_client
 
     def connected(self, client, userdata, flags, rc):
@@ -39,12 +39,8 @@ class MqttClient:
 
     def message(self, client, topic, message):
         print("New message on topic {0}: {1}".format(topic, message))
-        val = 0
-        try: 
-            val = int(message)  # attempt to parse it as a number
-        except ValueError:
-            pass
-        print("setting LED to color:",val)
+        if topic == "iotProject/image":
+            self.imageBytes = message
 
     def subscribe(self, topic):
         self.client.subscribe(topic)
